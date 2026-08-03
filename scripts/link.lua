@@ -1,4 +1,4 @@
-local flib_table = require("__flib__/table")
+--local flib_table = require("__flib__/table")
 
 local direction_string = {
   [defines.direction.north] = "north",
@@ -91,7 +91,7 @@ local link = {} --technically this revison might be less optimized due to redund
       if alice.linked_belt_type == bob.linked_belt_type then return end --we can't connect if theyre the same direction.
       alice.connect_linked_belts(bob)
     elseif alice.type == "pipe-to-ground" then--fluid method
-      alice.fluidbox.add_linked_connection(1,bob,1)
+      alice.add_fluid_box_linked_connection(1,bob,1)
     end
   end
 
@@ -125,8 +125,7 @@ local link = {} --technically this revison might be less optimized due to redund
     if alice.type == "linked-belt" then --linked belt method
       alice.disconnect_linked_belts()
     elseif alice.type == "pipe-to-ground" then--fluid method
-      local fluidbox = alice.fluidbox
-      fluidbox.remove_linked_connection(1)
+      alice.remove_fluid_box_linked_connection(1)
     end
   end
 
@@ -291,7 +290,7 @@ local link = {} --technically this revison might be less optimized due to redund
 
   function link.connect_ready_docks(direction) --check our ready docks and see if we can link any.
     for location_name,docks_at_location in pairs(storage.docks[direction]) do
-      storage.dock_k[direction][location_name] = flib_table.for_n_of(docks_at_location, storage.dock_k[direction][location_name], 1,
+      storage.dock_k[direction][location_name] = TFMG_table.for_n(docks_at_location, storage.dock_k[direction][location_name], 1,
       function(v,dock_id) --weird but its value, key, and we need the key
         link.attempt_connection(dock_id,direction,location_name)
       end)
@@ -299,9 +298,9 @@ local link = {} --technically this revison might be less optimized due to redund
   end
 
   function link.check_linked_docks()--check active connections to see if we should disconnect them.
-    storage.linked_docks_k = flib_table.for_n_of( storage.linked_docks, storage.linked_docks_k, 1,
+    storage.linked_docks_k = TFMG_table.for_n( storage.linked_docks, storage.linked_docks_k, 1,
     function(v,dock_id_1) --weird but its Value, Key, and we need the key
-      dock_id_2 = storage.docking_ports[dock_id_1].linked
+      local dock_id_2 = storage.docking_ports[dock_id_1].linked
       if not link.check_dock_connectability(dock_id_1,dock_id_2) then --if this returns false, we need to undock
         link.undock(dock_id_1)
       end

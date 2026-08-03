@@ -1,6 +1,7 @@
 util = require("util") --util functions are useful
-require("scripts.TFMG") --a few of my utility/debug functions.
-TFMG = require("scripts.TFMG")
+TFMG = require("__TFMG-lib__.control.util") --a few of my utility/debug functions.
+TFMG_table = require("__TFMG-lib__.control.table") --table functions
+
 require("scripts.docking") --handles the assembly of docking port multiblocks.
 docking = require("scripts.docking") 
 require("scripts.link") --handles linking docking ports.

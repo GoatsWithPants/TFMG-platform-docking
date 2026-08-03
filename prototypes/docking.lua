@@ -1,11 +1,8 @@
+local TFMG_util = require("__TFMG-lib__.data.util") --TFMG data stage functions, primarily the rocket capacity one
+
 local item_sounds = require("__base__.prototypes.item_sounds")
 local sounds = require("__base__.prototypes.entity.sounds")
 local hit_effects = require("__base__.prototypes.entity.hit-effects")
-
-local function rocket_capacity(capacity) --lazy copy paste from TFMG
-  local rocket_capacity = 1000000 --the vanilla default rocket lift weight. data.raw["utility-constants"]["default"].default_rocket_lift_weight
-  local weight = rocket_capacity/capacity
-return weight end
 
 --belt animation set
 
@@ -110,7 +107,7 @@ data:extend({
 		drop_sound = item_sounds.wood_inventory_move,
 		place_result = "TFMG-docking-port",
 		stack_size = 50,
-		weight = rocket_capacity(50),
+		weight = TFMG_util.rocket_capacity(50),
 		hidden = false,
 	},
 	{ --docking belt item
@@ -125,7 +122,7 @@ data:extend({
 		drop_sound = item_sounds.mechanical_inventory_move,
 		place_result = "TFMG-docking-belt",
 		stack_size = 50,
-		weight = rocket_capacity(50),
+		weight = TFMG_util.rocket_capacity(50),
 	},
 	{--docking pipe item
 		type = "item",
@@ -138,7 +135,7 @@ data:extend({
 		drop_sound = item_sounds.metal_small_inventory_move,
 		place_result = "TFMG-docking-pipe",
 		stack_size = 50,
-		weight = rocket_capacity(50),
+		weight = TFMG_util.rocket_capacity(50),
 		random_tint_color = item_tints.iron_rust,
 	},
 	{ --docking belt

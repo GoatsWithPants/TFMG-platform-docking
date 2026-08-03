@@ -89,6 +89,11 @@ local ui = {}
       name = "TFMG_dock_zero_signal",
       state = dock_storage.zero_dock
     }
+    --control_panel.add{ --worry about this feature later
+    --  type = "slider",
+    --  name = "TFMG_dock_zoom_slider",
+    --  value = player.mod_settings["TFMG-dock-preview-zoom"].value,
+    --}
   end
 
   function ui.connected_dock_preview(frame,player) --creates the connected dock preview frame
@@ -98,13 +103,14 @@ local ui = {}
       style = "inside_deep_frame",
       direction = "vertical",
     }
+    
     view_panel.style.horizontally_stretchable = true
     view_panel.style.vertically_stretchable = true
     view_panel.style.minimal_width = player.mod_settings["TFMG-dock-preview-size-x"].value --scale for gui scale
     view_panel.style.minimal_height = player.mod_settings["TFMG-dock-preview-size-y"].value
     view_panel.style.horizontal_align = "center"
     view_panel.style.vertical_align = "center"
-
+    
   return view_panel end
 
   function ui.set_view_panel_camera(view_panel,dock_storage,player) --sets dock camera
@@ -112,24 +118,25 @@ local ui = {}
 
     if dock_storage.linked then --if we have a currently linked entity.
       local linked_entity = storage.docking_ports[dock_storage.linked].dock
-
       local camera = view_panel.add{
         type = "camera",
+        name = "TFMG_dock_view_camera",
         position = {0,0}
       }
       camera.style.horizontally_stretchable = true
       camera.style.vertically_stretchable = true
       camera.entity = linked_entity
-      camera.zoom = player.mod_settings["TFMG-dock-preview-zoom"].value
-      camera.visible = true
-
+      if player.mod_settings["TFMG-dock-preview-dynamic-zoom"] then
+        camera.zoom = player.zoom
+      else
+        camera.zoom = player.mod_settings["TFMG-dock-preview-zoom"].value
+      end
     else --show no dock connected
       view_panel.add{
         type = "label",
         caption = {"docking-ui.view-panel-no-dock"}
       }
     end
-
   end
 
 --create dock ui primary
@@ -185,17 +192,86 @@ local ui = {}
   end
 
   function ui.on_gui_click(event)
-    if event.element and event.element.name == "TFMG_dock_ui_x_button" then
+    if not event.element then return end
+    if event.element.name == "TFMG_dock_ui_x_button" then
       ui.find_parent_frame(event.element).destroy()
+    elseif event.element.name == "TFMG_dock_view_camera" then
+      ui.camera_window_clicked(event)
     end
-
   end
 
+  function ui.camera_window_clicked(event)
+    --TFMG.block(event)
+    local camera_focus = event.element.entity
+    local player = game.players[event.player_index]
+
+    player.centered_on = camera_focus
+    player.opened = camera_focus
+  end
+
+  function ui.zoom_in(event)
+    TFMG.block(event)
+  end
+
+  function ui.zoom_out(event)
+    TFMG.block(event)
+  end
   function ui.on_gui_closed(event)
     if event.element and event.element.tags["TFMG_dock_ui"] then
       event.element.destroy()
       storage.player_ui[event.player_index] = nil --delete ui
     end
+  end
+  local function create_highlight_box(entity,player_index) --create a highlight box
+    if not entity.valid then return end
+    local surface = entity.surface
+
+    local box_type = "electricity"
+
+    --change the colour of the highlight boxes if the child is currently linked
+    if entity.type == "linked-belt" then --linked belt method
+      if entity.linked_belt_neighbour then
+        box_type = "pair"
+      end
+    elseif entity.type == "pipe-to-ground" then--fluid method
+      if entity.get_fluid_box_linked_connection(1) then
+        box_type = "pair"
+      end
+    end
+
+    local guibox = surface.create_entity({
+      type = "highlight-box",
+      name = "highlight-box",
+      box_type = box_type,
+      position = entity.position,
+      source = entity,
+      render_player_index = player_index,
+    })
+
+    if not storage.player_gui_boxes[player_index] then storage.player_gui_boxes[player_index] = {} end
+    local gui_boxes = storage.player_gui_boxes[player_index]
+    table.insert(gui_boxes,guibox) --save this guibox so we can delete it when the player deselects the port later
+  end
+
+  local function delete_highlight_boxes(player_index) --clear out a players highlight boxes
+    local gui_boxes = storage.player_gui_boxes[player_index]
+    if not gui_boxes then return end
+    for _,gui_box in pairs(gui_boxes) do
+      gui_box.destroy()
+    end
+    storage.player_gui_boxes[player_index] = nil --cleanup our guiboxes storage
+  end
+  function ui.selection(event) --create selection boxes for the children of a docking port when hovering over it
+    local player_index = event.player_index
+    local player = game.players[player_index]
+    local entity = player.selected
+    if not entity or entity.name ~= "TFMG-docking-port" then
+      delete_highlight_boxes(player_index)
+    return end
+
+    local dock_storage = storage.docking_ports[entity.unit_number]
+    for _,child in pairs(dock_storage.children.positive) do create_highlight_box(child,player_index) end
+    for _,child in pairs(dock_storage.children.negative) do create_highlight_box(child,player_index) end
   end
 
   function ui.on_gui_elem_changed(event)
@@ -216,7 +292,7 @@ local ui = {}
     for _,player in pairs(game.connected_players) do
       local main_frame = storage.player_ui[player.index]
       if main_frame and main_frame.valid then
-        ui.update_ui(main_frame,player)
+        ui.update_ui(main_frame,player) --why are we updating the ui every tick?
       end
     end
   end

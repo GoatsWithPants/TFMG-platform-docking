@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.0
+Date: ???
+  Features:
+    - Support for factorio 2.1 added
+    - Clicking on the little camera window takes you to the cameras location. So cool!
+    - Added Dynamic dock preview zoom, the dock preview will automatically zoom in and out to match your main cameras zoom, which helps in building docks. (can be disabled)
+    - Hovering over a docking port controller will also highlight the docking belts and pipes making up the docking port, currently linked parts will be in green, while unlinked parts will be blue. This doesnt update in real time rn.
+  Changes:
+    - Flib dependency replaced with TFMG-lib dependency
+---------------------------------------------------------------------------------------------------
 Version: 0.2.2
 Date: 2026-05-05
   Changes:

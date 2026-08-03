@@ -23,7 +23,7 @@ local function setup_storage()--make sure all important storage tables are ready
       if not table[location.name] then table[location.name] = {} end
     end
   end
-  --repeat but for the flib from k thingy
+  --repeat but for the flib from k thingy --now the TFMG for_n thing !
 
   if not storage.dock_k then
     storage.dock_k = {}
@@ -45,6 +45,7 @@ local function setup_storage()--make sure all important storage tables are ready
   end
 
   if not storage.player_ui then storage.player_ui = {} end
+  if not storage.player_gui_boxes then storage.player_gui_boxes = {} end
 
   for player_index, player in pairs(game.players) do
     if not storage.player_ui[player_index] then storage.player_ui[player_index] = {} end
@@ -203,5 +204,10 @@ script.on_event("interface-flip-vertical",
     docking.belt_flip(event)
   end
 )
+
+script.on_event("on_selected_entity_changed",
+  function(event)
+    ui.selection(event)
+  end)
 
 

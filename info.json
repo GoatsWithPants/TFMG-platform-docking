@@ -1,13 +1,13 @@
 {
   "name": "TFMG-platform-docking",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "title": "TFMG: Platform Docking",
   "author": "oobanooba",
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.7",
     "space-age >= 2.1.7",
-    "flib >= 0.16.5"
+    "TFMG-lib >= 0.5.0"
   ],
   "space_travel_required": true,
   "description": "Inter-platform logistics with belts. Instaid of teleporting items between platforms, platforms must be docked and items moved through belts."

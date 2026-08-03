@@ -1,4 +1,3 @@
-local flib_table = require("__flib__/table")
 local math2d = require("__core__/lualib/math2d")
 
 local dock_parts_filter = {"TFMG-docking-port","TFMG-docking-belt","TFMG-docking-pipe"}
@@ -144,6 +143,12 @@ local docking = {}
       find_dock_splitter(belt)
     end
   end
+  function docking.is_docking_part(entity)--returns weather or not an object is a docking part
+    for _,part in pairs(dock_parts_filter) do
+      if entity.name == part then return true end
+    end
+  return false end
+  
 
 
 --local functions
