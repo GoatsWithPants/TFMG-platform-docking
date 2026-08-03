@@ -225,18 +225,12 @@ local ui = {}
   local function create_highlight_box(entity,player_index) --create a highlight box
     if not entity.valid then return end
     local surface = entity.surface
-
     local box_type = "electricity"
-
     --change the colour of the highlight boxes if the child is currently linked
     if entity.type == "linked-belt" then --linked belt method
-      if entity.linked_belt_neighbour then
-        box_type = "pair"
-      end
+      if entity.linked_belt_neighbour then box_type = "pair" end
     elseif entity.type == "pipe-to-ground" then--fluid method
-      if entity.get_fluid_box_linked_connection(1) then
-        box_type = "pair"
-      end
+      if entity.get_fluid_box_linked_connection(1) then box_type = "pair" end
     end
 
     local guibox = surface.create_entity({
