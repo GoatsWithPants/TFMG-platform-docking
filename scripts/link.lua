@@ -221,7 +221,7 @@ local link = {} --technically this revison might be less optimized due to redund
     local dock_input_signal_1 = get_dock_signals(dock_storage_1.dock,docking_signal_1)
     local dock_input_signal_2 = get_dock_signals(dock_storage_2.dock,docking_signal_1)
 
-    if dock_input_signal_1 ~= dock_input_signal_2 then return false end
+    if dock_input_signal_1 ~= dock_input_signal_2 then  return false end
 
     if not dock_storage_1.zero_dock  and dock_input_signal_1 == 0 then return false end --dont dock if either signal is zero and the dock with 0 signal isnt enabled
     if not dock_storage_2.zero_dock  and dock_input_signal_2 == 0 then return false end
