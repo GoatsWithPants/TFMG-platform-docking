@@ -1,6 +1,6 @@
 local math2d = require("__core__/lualib/math2d")
 
-local dock_parts_filter = {"TFMG-docking-port","TFMG-docking-belt","TFMG-docking-pipe"}
+local dock_parts_filter = {"TFMG-docking-port","TFMG-docking-belt","TFMG-docking-pipe","TFMG-docking-radar"}
 local dock_belts_filter = {"TFMG-docking-belt"}
 local dock_pipes_filter = {"TFMG-docking-pipe"}
 local max_dock_size = 1000
@@ -224,6 +224,11 @@ local docking = {}
     local dock
     if direction == 4 or direction == 12 then --we need to know what axis to check.
       dock = docking.find_parent("y",position,surface)
+    elseif direction == 0 then -- not rotatable entities, check both axes
+      dock = docking.find_parent("x",position,surface)
+      if not dock then 
+        dock = docking.find_parent("y",position,surface) 
+      end
     else
       dock = docking.find_parent("x",position,surface)
     end
@@ -292,20 +297,34 @@ local docking = {}
   local function on_docking_pipe_created(event)
     local connector = event.entity
     connector.rotatable = false
+    connector.is_freezable = true
+    connector.frozen = true
     make_parent(connector)
     create_collider(event)
   end
 
 
+  local function on_docking_radar_created(event)
+    local connector = event.entity
+    connector.rotatable = false
+    connector.operable = false  -- don't want player to access gui of radar
+    connector.disabled_by_script = true
+    make_parent(connector)   -- todo check this
+    create_collider(event)   -- todo check this 
+
+  end
+
 
 --callable functions
-  function docking.handle_build_event(event) --call me yandredev
+  function docking.handle_build_event(event)
     if event.entity.name == "TFMG-docking-port" then
       on_docking_port_created(event)
     elseif event.entity.name == "TFMG-docking-belt" then
       on_docking_belt_created(event)
     elseif event.entity.name == "TFMG-docking-pipe" then
       on_docking_pipe_created(event)
+    elseif event.entity.name == "TFMG-docking-radar" then   
+      on_docking_radar_created(event)
     else
       find_dock_belt(event.entity)
     end

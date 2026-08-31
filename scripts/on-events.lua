@@ -78,6 +78,11 @@ local build_event_filter = {--what entities the on build events should check for
   	mode = "or"
   },
   {
+  	filter = "name",
+  	name = "TFMG-docking-radar",
+  	mode = "or"
+  },
+  {
     filter = "transport-belt-connectable",
     mode = "or"
   },

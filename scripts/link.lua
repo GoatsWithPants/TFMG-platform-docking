@@ -92,6 +92,15 @@ local link = {} --technically this revison might be less optimized due to redund
       alice.connect_linked_belts(bob)
     elseif alice.type == "pipe-to-ground" then--fluid method
       alice.add_fluid_box_linked_connection(1,bob,1)
+    elseif alice.type == "radar" then--circuit method"
+      local aliceConnectorGreen = alice.get_wire_connector(defines.wire_connector_id.circuit_green, true)
+      local aliceConnectorRed = alice.get_wire_connector(defines.wire_connector_id.circuit_red, true)
+      local bobConnectorGreen = bob.get_wire_connector(defines.wire_connector_id.circuit_green, true)
+      local bobConnectorRed = bob.get_wire_connector(defines.wire_connector_id.circuit_red, true)
+      aliceConnectorGreen.connect_to(bobConnectorGreen, false, defines.wire_origin.script)
+      aliceConnectorRed.connect_to(bobConnectorRed, false, defines.wire_origin.script)
+      alice.disabled_by_script = false
+      bob.disabled_by_script = false
     end
   end
 
@@ -119,33 +128,43 @@ local link = {} --technically this revison might be less optimized due to redund
     end
   end
 
-  function link.unlink_child(alice) --unlinks an entity if it is linked
+  function link.unlink_child(alice, bob) --unlinks an entity if it is linked
     if not alice.valid then return end
+    if not bob.valid then return end
 
     if alice.type == "linked-belt" then --linked belt method
       alice.disconnect_linked_belts()
     elseif alice.type == "pipe-to-ground" then--fluid method
       alice.remove_fluid_box_linked_connection(1)
+    elseif alice.type == "radar" then--radar  method 
+      for wire_ID,wire_connector in pairs(alice.get_wire_connectors()) do
+        wire_connector.disconnect_all(defines.wire_origin.script) -- remove all wires added by script 
+        alice.disabled_by_script = true
+        bob.disabled_by_script = true
+      end
     end
   end
 
-  function link.divorce(dock_id) --unlinks all of a docks children.
-    local dock_storage = storage.docking_ports[dock_id]
+  function link.divorce(dock_id_1, dock_id_2) --unlinks all of a docks children.
+    local port_1 = storage.docking_ports[dock_id_1]
+    local port_2 = storage.docking_ports[dock_id_2]
     
-    if not dock_storage.children then return end
-    if dock_storage.children.positive then
-      for _,alice in pairs(dock_storage.children.positive) do
-        link.unlink_child(alice)
-      end
+    for _, alice in pairs(port_1.children.positive) do 
+      if not alice.valid then return end 
+      local bob = port_2.children.positive[_]
+      if not bob then break end 
+      if not bob.valid then return end
+      link.unlink_child(alice, bob)
     end
 
-    if dock_storage.children.negative then
-      for _,alice in pairs(dock_storage.children.negative) do
-        link.unlink_child(alice)
-      end
+    for _, alice in pairs(port_1.children.negative) do 
+      if not alice.valid then return end 
+      local bob = port_2.children.negative[_]
+      if not bob then break end 
+      if not bob.valid then return end
+      unlink_child(alice, bob)
     end
   end
-
 
 --Dock and undock handlers, these call the link subhandlers, and also call the appropriate data modification functions.
 
@@ -154,7 +173,7 @@ local link = {} --technically this revison might be less optimized due to redund
 
     local dock_id_2 = dock_storage.linked
     if not dock_id_2 then return end --we cannot at all undock a dock that is not docked.
-    link.divorce(dock_id) --physically undock the entities
+    link.divorce(dock_id, dock_id_2) --physically undock the entities
 
     link.remove_from_linked_docks(dock_id_2) --remove from the currently linked docks list
     link.remove_from_linked_docks(dock_id)
@@ -221,7 +240,7 @@ local link = {} --technically this revison might be less optimized due to redund
     local dock_input_signal_1 = get_dock_signals(dock_storage_1.dock,docking_signal_1)
     local dock_input_signal_2 = get_dock_signals(dock_storage_2.dock,docking_signal_1)
 
-    if dock_input_signal_1 ~= dock_input_signal_2 then  return false end
+    if dock_input_signal_1 ~= dock_input_signal_2 then return false end
 
     if not dock_storage_1.zero_dock  and dock_input_signal_1 == 0 then return false end --dont dock if either signal is zero and the dock with 0 signal isnt enabled
     if not dock_storage_2.zero_dock  and dock_input_signal_2 == 0 then return false end
@@ -275,7 +294,7 @@ local link = {} --technically this revison might be less optimized due to redund
     link.update_dock_location(dock_entity,space_location)
     link.undock(dock_id)
     link.unready_dock(dock_id) --Sets dock unready, incase it hasnt already.
-    link.ready_dock(dock_id) --sets dock to ready if appropriate
+    link.ready_dock(dock_id) --sets dock to ready if appropriate   --todo check this @@!! 
   end
 
   function link.clear_dock_data(dock_id) --cleans up dock data

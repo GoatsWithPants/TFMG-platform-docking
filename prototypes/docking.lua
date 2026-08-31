@@ -138,6 +138,20 @@ data:extend({
 		weight = TFMG_util.rocket_capacity(50),
 		random_tint_color = item_tints.iron_rust,
 	},
+	{ --docking radar item
+		type = "item",
+		name = "TFMG-docking-radar",
+		icon = "__TFMG-platform-docking__/graphics/docking-radar-icon.png",
+		hidden = false,
+		subgroup = "space-related",
+		order = "k-d",
+		inventory_move_sound = item_sounds.mechanical_inventory_move,
+		pick_sound = item_sounds.mechanical_inventory_pickup,
+		drop_sound = item_sounds.mechanical_inventory_move,
+		place_result = "TFMG-docking-radar",
+		stack_size = 50,
+		weight = TFMG_util.rocket_capacity(50),
+	},
 	{ --docking belt
 		type = "linked-belt",
 		name = "TFMG-docking-belt",
@@ -358,6 +372,78 @@ data:extend({
 			},
 		},
 	},
+	{ --docking radar entity
+		type = "radar",
+		name = "TFMG-docking-radar",
+		icon = "__TFMG-platform-docking__/graphics/docking-radar-icon.png",
+		flags = { "placeable-neutral", "player-creation"},
+		hidden = false,
+		minable = { mining_time = 0.1, result = "TFMG-docking-radar"},
+		max_health = 160,
+		corpse = "radar-remnants",   
+		dying_explosion = "radar-explosion",
+		heating_energy = "1W",
+		energy_usage = "1kW",
+		energy_per_sector = "1kW",
+		energy_per_nearby_scan = "1kW",
+		energy_source = {type = "void", usage_priority = "lamp"},
+		max_distance_of_sector_revealed = 0,
+		max_distance_of_nearby_sector_revealed = 0,
+		connects_to_other_radars = false,
+		open_sound = sounds.machine_open,
+		close_sound = sounds.machine_close,
+		collision_box = { { -0.4, -0.4 }, { 0.4, 0.4 } },
+		selection_box = { { -0.5, -0.5 }, { 0.5, 0.5 } },
+		surface_conditions = { { property = "gravity", min = 0, max = 0 } },
+		damaged_trigger_effect = hit_effects.entity(),
+		fast_replaceable_group = "docking-parts",  
+		circuit_connector = circuit_connector_definitions["lamp"],
+    	circuit_wire_max_distance = default_circuit_wire_max_distance,
+		integration_patch =
+			{
+				filename = "__base__/graphics/entity/radar/radar-integration.png",
+				priority = "low",
+				width = 238,
+				height = 216,
+				shift = util.by_pixel(1.5, 4.0),
+				scale = 0.5
+			},
+		pictures =
+		{
+			layers =
+			{
+				{
+					variation_count = 64,
+					filename = "__TFMG-platform-docking__/graphics/docking-radar.png",
+					priority = "low",
+					width = 196,
+					height = 254,
+					apply_projection = false,
+					direction_count = 64,
+					line_length = 8,
+					--shift = util.by_pixel(1.0, -16.0),
+					scale = 0.15
+				},
+				{
+					filename = "__base__/graphics/entity/radar/radar-shadow.png",
+					priority = "low",
+					width = 336,
+					height = 170,
+					apply_projection = false,
+					direction_count = 64,
+					line_length = 8,
+					--shift = util.by_pixel(39.0, 6.0),
+					draw_as_shadow = true,
+					scale = 0.15
+				}
+			}
+		},
+		max_text_width = 400,
+		text_shift = util.by_pixel(0, -24),
+		icon_draw_specification = {shift = util.by_pixel(0.5, -8), scale = 0.5},
+		text_color = {1.0, 1.0, 1.0, 1.0},
+		background_color = {0.0, 0.0, 0.0, 0.25}
+	},
 	--recipe time
 	{ --docking controller
 		type = "recipe",
@@ -372,6 +458,21 @@ data:extend({
 		},
 		results = {
 			{ type = "item", name = "TFMG-docking-port", amount = 1 },
+		},
+	},
+	{ --docking radar
+		type = "recipe",
+		name = "TFMG-docking-radar",
+		energy_required = 4,
+		enabled = false,
+		allow_productivity = false,
+		ingredients = {
+			{ type = "item", name = "constant-combinator", amount = 1 },
+			{ type = "item", name = "processing-unit", amount = 8 },
+			{ type = "item", name = "steel-plate", amount = 8 },
+		},
+		results = {
+			{ type = "item", name = "TFMG-docking-radar", amount = 1 },
 		},
 	},
 	{ --docking belt
@@ -425,6 +526,10 @@ data:extend({
 			{
 				type = "unlock-recipe",
 				recipe = "TFMG-docking-belt",
+			},
+			{
+				type = "unlock-recipe",
+				recipe = "TFMG-docking-radar",
 			},
 		},
 		prerequisites = { "space-science-pack", "logistics-3"},
