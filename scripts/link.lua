@@ -285,7 +285,7 @@ local link = {} --technically this revison might be less optimized due to redund
     local dock_entity = storage.docking_ports[dock_id].dock
     local space_location = dock_entity.surface.platform.space_location
     link.update_dock_location(dock_entity,space_location)
-    link.undock(dock_id) -- todo check here 
+    link.undock(dock_id) 
     link.unready_dock(dock_id) --Sets dock unready, incase it hasnt already.
     link.ready_dock(dock_id) --sets dock to ready if appropriate   
   end

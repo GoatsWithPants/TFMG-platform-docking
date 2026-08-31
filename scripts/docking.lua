@@ -306,9 +306,9 @@ local docking = {}
     local connector = event.entity
     connector.rotatable = false
     connector.operable = false  -- don't want player to access gui of radar
-    connector.disabled_by_script = true
-    make_parent(connector)   -- todo check this
-    create_collider(event)   -- todo check this 
+    connector.disabled_by_script = true -- disable on build, gets enabled on link and disabled on unlink 
+    make_parent(connector)   
+    create_collider(event)   
 
   end
 
