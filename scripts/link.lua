@@ -128,9 +128,8 @@ local link = {} --technically this revison might be less optimized due to redund
     end
   end
 
-  function link.unlink_child(alice, bob) --unlinks an entity if it is linked
+  function link.unlink_child(alice) --unlinks an entity if it is linked
     if not alice.valid then return end
-    if not bob.valid then return end
 
     if alice.type == "linked-belt" then --linked belt method
       alice.disconnect_linked_belts()
@@ -140,29 +139,21 @@ local link = {} --technically this revison might be less optimized due to redund
       for wire_ID,wire_connector in pairs(alice.get_wire_connectors()) do
         wire_connector.disconnect_all(defines.wire_origin.script) -- remove all wires added by script 
         alice.disabled_by_script = true
-        bob.disabled_by_script = true
       end
     end
   end
 
-  function link.divorce(dock_id_1, dock_id_2) --unlinks all of a docks children.
+  function link.divorce(dock_id_1) --unlinks all of a docks children.
     local port_1 = storage.docking_ports[dock_id_1]
-    local port_2 = storage.docking_ports[dock_id_2]
-    
+  
     for _, alice in pairs(port_1.children.positive) do 
       if not alice.valid then return end 
-      local bob = port_2.children.positive[_]
-      if not bob then break end 
-      if not bob.valid then return end
-      link.unlink_child(alice, bob)
+      link.unlink_child(alice)
     end
 
     for _, alice in pairs(port_1.children.negative) do 
       if not alice.valid then return end 
-      local bob = port_2.children.negative[_]
-      if not bob then break end 
-      if not bob.valid then return end
-      unlink_child(alice, bob)
+      unlink_child(alice)
     end
   end
 
@@ -173,8 +164,10 @@ local link = {} --technically this revison might be less optimized due to redund
 
     local dock_id_2 = dock_storage.linked
     if not dock_id_2 then return end --we cannot at all undock a dock that is not docked.
-    link.divorce(dock_id, dock_id_2) --physically undock the entities
+    link.divorce(dock_id) --physically undock the entities
+    link.divorce(dock_id_2) --physically undock the entities
 
+    -- divorce 1 and 2 here
     link.remove_from_linked_docks(dock_id_2) --remove from the currently linked docks list
     link.remove_from_linked_docks(dock_id)
 
@@ -292,7 +285,7 @@ local link = {} --technically this revison might be less optimized due to redund
     local dock_entity = storage.docking_ports[dock_id].dock
     local space_location = dock_entity.surface.platform.space_location
     link.update_dock_location(dock_entity,space_location)
-    link.undock(dock_id)
+    link.undock(dock_id) -- todo check here 
     link.unready_dock(dock_id) --Sets dock unready, incase it hasnt already.
     link.ready_dock(dock_id) --sets dock to ready if appropriate   
   end
