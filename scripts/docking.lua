@@ -297,8 +297,6 @@ local docking = {}
   local function on_docking_pipe_created(event)
     local connector = event.entity
     connector.rotatable = false
-    connector.is_freezable = true
-    connector.frozen = true
     make_parent(connector)
     create_collider(event)
   end

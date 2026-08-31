@@ -294,7 +294,7 @@ local link = {} --technically this revison might be less optimized due to redund
     link.update_dock_location(dock_entity,space_location)
     link.undock(dock_id)
     link.unready_dock(dock_id) --Sets dock unready, incase it hasnt already.
-    link.ready_dock(dock_id) --sets dock to ready if appropriate   --todo check this @@!! 
+    link.ready_dock(dock_id) --sets dock to ready if appropriate   
   end
 
   function link.clear_dock_data(dock_id) --cleans up dock data
