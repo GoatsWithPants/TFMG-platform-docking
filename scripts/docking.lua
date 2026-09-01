@@ -252,6 +252,8 @@ local docking = {}
             --game.print("flip")
         end
       end
+    elseif entity.name == "TFMG-docking-pipe" then -- I don't know why docking pipe needs to be flipped, but when placed, collision detection gets reversed. Very strange, flipping it here fixes it (mostly?)
+      direction = opposite[direction]
     end
     script.register_on_object_destroyed(entity)
     local collider = surface.create_entity{
@@ -308,7 +310,6 @@ local docking = {}
     connector.operable = false  -- don't want player to access gui of radar
     connector.disabled_by_script = true -- disable on build, gets enabled on link and disabled on unlink 
     make_parent(connector)   
-    create_collider(event)   
 
   end
 
