@@ -398,15 +398,6 @@ data:extend({
 		fast_replaceable_group = "docking-parts",  
 		circuit_connector = circuit_connector_definitions["lamp"],
     	circuit_wire_max_distance = default_circuit_wire_max_distance,
-		integration_patch =
-			{
-				filename = "__base__/graphics/entity/radar/radar-integration.png",
-				priority = "low",
-				width = 238,
-				height = 216,
-				shift = util.by_pixel(1.5, 4.0),
-				scale = 0.5
-			},
 		pictures =
 		{
 			layers =
