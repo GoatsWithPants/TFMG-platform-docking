@@ -153,7 +153,7 @@ local link = {} --technically this revison might be less optimized due to redund
 
     for _, alice in pairs(port_1.children.negative) do 
       if not alice.valid then return end 
-      unlink_child(alice)
+      link.unlink_child(alice)
     end
   end
 
